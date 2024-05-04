@@ -1,69 +1,35 @@
 package baseClass;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
 import utils.ReadConfig;
-
+import utils.BrowserFactory;
 
 import java.io.IOException;
-import java.time.Duration;
+
 
 public class BaseTest {
+    public WebDriver driver;
+    public static ReadConfig config;
 
-    //reads config file
-    ReadConfig readConfig;
+
+    @BeforeSuite
+    public void setUpSuite() throws IOException {
+        config=new ReadConfig();
+
+    }
+
+    @BeforeClass
+    public void setUp()
     {
-        try {
-            readConfig = new ReadConfig();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        driver= BrowserFactory.startApplication(driver,config.getBrowser(),config.getApplicationURL());
     }
-    //====================Initializing public variables that we use
-    //by using following code, it omits the need to use of the chrome driver as a separate file. what is does is get dependencies using maven
-    public static ChromeOptions options = new ChromeOptions();
-    public static WebDriver driver=new ChromeDriver(options);
-
-    public WebDriverWait wait = new WebDriverWait(driver,  Duration.ofSeconds(10));
-    public String BaseURL = readConfig.getApplicationURL();
-    public String username = readConfig.getUsername();
-    public String password = readConfig.getPassword();
-
-    @BeforeTest
-    void Setup()
+    @AfterClass
+    public void tearDown()
     {
-        WebDriverManager.chromedriver().setup();
-        driver.manage().window().maximize();
-
-        driver.get(BaseURL);
-
-    }
-    @Test
-    void testSteps() {
-        driver.findElement(By.id("user-name")).sendKeys(username);
-        driver.findElement(By.id("password")).sendKeys(password);
-        driver.findElement(By.id("login-button")).click();
-
-        WebElement pageTitle = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"header_container\"]/div[1]/div[2]/div")));
-        Assert.assertEquals(pageTitle.getText(),"Swag Labs");
-
-        //Logger.info("Login test passed.Successfully logged into Dashboard");
-
+        BrowserFactory.quitBrowser(driver);
     }
 
-    @AfterTest
-    public void tearDown() {
-       // extent.flush();
-        driver.close();
-    }
 }

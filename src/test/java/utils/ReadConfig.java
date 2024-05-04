@@ -20,8 +20,8 @@ public class ReadConfig
     }
     public String getApplicationURL()
     {
-        String url = pro.getProperty("BaseURL");
-        return url;
+        String URL = pro.getProperty("BaseURL");
+        return URL;
     }
     public String getUsername()
     {
@@ -32,5 +32,10 @@ public class ReadConfig
     {
         String Password = pro.getProperty("Password");
         return Password;
+    }
+    public String getBrowser()
+    {
+        String Browser = pro.getProperty("Browser_Name");
+        return Browser;
     }
 }
